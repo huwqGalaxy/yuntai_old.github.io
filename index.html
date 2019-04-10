@@ -62,6 +62,110 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-静态代理、JDK动态代理、CgLib动态代理" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/04/10/静态代理、JDK动态代理、CgLib动态代理/" class="article-date">
+  <time datetime="2019-04-10T12:41:00.000Z" itemprop="datePublished">2019-04-10</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/04/10/静态代理、JDK动态代理、CgLib动态代理/">静态代理、JDK动态代理、CgLib动态代理</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>代理模式：</p>
+<ol>
+<li>静态代理</li>
+<li>动态代理<ol>
+<li>jdk动态代理</li>
+<li>cgLib动态代理<br>使用目的：解决在直接访问对象时带来的问题，比如说：要访问的对象在远程的机器上。在面对对象系统中，有些对象由于某些原因（比如对象创建开销很大，或者某些操作需要安全控制，或者需要进程外的访问，直接访问会给使用者或者系统结构带来很多麻烦</li>
+</ol>
+</li>
+</ol>
+<p>每一个动态代理类中都必须实现Invocation接口，实现其中的invoke方法<br>JDK的动态代理必须需要目标对象实现接口，否则不能生成代理对象<br>UserServiceImpl implements UserService</p>
+<h5 id="静态代理"><a href="#静态代理" class="headerlink" title="静态代理"></a>静态代理</h5><p>静态代理方式是为每个被代理的对象构造对应的代理类。在程序运行前，代理类的class文件已经存在了。但是一个代理类对应一个被代理对象。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">public interface UserService &#123;</span><br><span class="line">    void addUser();</span><br><span class="line">&#125;</span><br><span class="line">public class UserServiceImpl implements UserService &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public void addUser() &#123;</span><br><span class="line">        System.out.println(&quot;添加一名用户&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">public class StaticProxy implements UserService&#123;</span><br><span class="line"></span><br><span class="line">    private UserServiceImpl userServiceImpl;</span><br><span class="line"></span><br><span class="line">    public StaticProxy(UserServiceImpl userServiceImpl) &#123;</span><br><span class="line">        this.userServiceImpl = userServiceImpl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void addUser() &#123;</span><br><span class="line">        System.out.println(&quot;运行方法前日志&quot;);</span><br><span class="line">        userServiceImpl.addUser();</span><br><span class="line">        System.out.println(&quot;运行方法后日志&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">public class StaticProxyFactory &#123;</span><br><span class="line">    public static StaticProxy newInstance()&#123;</span><br><span class="line">        return new StaticProxy(new UserServiceImpl());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">调用时</span><br><span class="line">StaticProxy staticProxy = StaticProxyFactory.newInstance();</span><br><span class="line">staticProxy.addUser();</span><br></pre></td></tr></table></figure></p>
+<p>这种方式是继承同一个接口，然后内部维护了一个实现类，也可以直接继承该实现类，方法实现用super调用。<br>优点：业务类只需要关注业务逻辑本身，保证了业务类的重用性。这是代理模式的共有优点<br>缺点：</p>
+<ol>
+<li>代理对象的一个接口只服务于一种类型的对象，如果要代理的类型很多，势必要为每一种类型的方法都进行代理</li>
+<li>如果接口增加一个方法，除了所有实现类需要实现这个方法外，所有代理类也需要实现此方法。增加了代码维护的复杂度。</li>
+</ol>
+<p>和装饰设计模式的核心区别：<br>    装设设计模式是对被装饰者对象执行结果(map)的处理<br>    而静态代理是在调用委托类对象方法执行前后做一些其他操作</p>
+<h5 id="动态代理"><a href="#动态代理" class="headerlink" title="动态代理"></a>动态代理</h5><p>动态代理是在实现阶段不用关心代理类，而在运行阶段才指定哪一个对象。invoke方法采用回调的方式执行，只有在代理对象执行方法时，才会被invoke拦截</p>
+<h6 id="JDK动态代理"><a href="#JDK动态代理" class="headerlink" title="JDK动态代理"></a>JDK动态代理</h6><p>JDK动态代理所用到的代理类在程序调用到代理类对象时才由JVM真正创建，JVM根据传进来的 业务实现类对象 以及 方法名 ，动态地创建了一个代理类的class文件并被字节码引擎执行，然后通过该代理类对象进行方法调用。<br>实现步骤</p>
+<ol>
+<li>创建被代理的类以及实现的接口</li>
+<li>创建一个实现接口InvocationHandler的类，必须实现invoke方法</li>
+<li>调用Proxy的newProxyInstance静态方法，创建一个代理类</li>
+<li>通过代理对象调用目标方法</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">interface Hello &#123;</span><br><span class="line">    void sayHello();</span><br><span class="line">&#125;</span><br><span class="line">class HelloImpl implements Hello &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public void sayHello() &#123;</span><br><span class="line">        System.out.println(&quot;hello&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">class MyInvocationHandler implements InvocationHandler &#123;</span><br><span class="line">    private Object target;</span><br><span class="line"></span><br><span class="line">    public MyInvocationHandler(Object target) &#123;</span><br><span class="line">        this.target = target;</span><br><span class="line">    &#125;</span><br><span class="line">    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable &#123;</span><br><span class="line">        System.out.println(&quot;method :&quot; + method.getName() + &quot; is invoked!&quot;);</span><br><span class="line">        return method.invoke(target, args);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">main&#123;</span><br><span class="line">    Hello helloWorld = (Hello) Proxy.</span><br><span class="line">        newProxyInstance(JDKProxyTest.class.getClassLoader(),</span><br><span class="line">                new Class&lt;?&gt;[]&#123;Hello.class&#125;,</span><br><span class="line">                new MyInvocationHandler(new HelloImpl()));</span><br><span class="line">helloWorld.sayHello();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>实现InvocationHandler接口步骤</p>
+<ol>
+<li>定义含参构造方法，该参数为要代理的实例对象，目的是用于执行method.invoke()方法(也就是执行目标方法)</li>
+<li>实现接口的invoke()方法，该方法用于对目标方法的增强处理，比如记录日志等。该方法的返回值就是代理对象执行目标方法的返回值</li>
+</ol>
+<p>具体参数</p>
+<ol>
+<li>proxy 动态dialing生成的代理对象</li>
+<li>method 目标方法的实例</li>
+<li><p>args 目标方法的参数<br>通过Proxy.newProxyInstance方法生成代理对象，具体参数有</p>
+</li>
+<li><p>loader目标类的类加载器</p>
+</li>
+<li>interfaces 目标类实现的接口</li>
+<li>InvocationHandler 调用处理类的实现对象</li>
+</ol>
+<p>注意点：JDK的动态代理只能代理实现了接口的类</p>
+<h6 id="cglib动态代理"><a href="#cglib动态代理" class="headerlink" title="cglib动态代理"></a>cglib动态代理</h6><p>cglib是针对类来实现代理的，原理是通过字节码对指定的业务类生成一个子类，并覆盖其中业务方法实现代理，顺势织入横切逻辑。因为采用的是继承，所以不能对final修饰的类进行代理。<br>需要引入依赖<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">   &lt;groupId&gt;cglib&lt;/groupId&gt;</span><br><span class="line">   &lt;artifactId&gt;cglib-nodep&lt;/artifactId&gt;</span><br><span class="line">   &lt;version&gt;2.2&lt;/version&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br></pre></td></tr></table></figure></p>
+<p>例子<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">//代理类</span><br><span class="line">public class UserServiceCglibMethodInterceptor implements MethodInterceptor &#123;</span><br><span class="line"></span><br><span class="line">	@Override</span><br><span class="line">	public Object intercept(Object object, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable &#123;</span><br><span class="line">		System.out.println(&quot;Cglib Before add&quot;);</span><br><span class="line">		Object result = methodProxy.invokeSuper(object, objects);</span><br><span class="line">		System.out.println(&quot;Cglib After add&quot;);</span><br><span class="line">		return result;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">//代理工厂</span><br><span class="line">public class ProxyCglibFactory &#123;</span><br><span class="line"></span><br><span class="line">	public static UserService getInstance() &#123;</span><br><span class="line">		Enhancer enhancer = new Enhancer();  </span><br><span class="line">		enhancer.setSuperclass(UserServiceImpl.class);  </span><br><span class="line">		enhancer.setCallback(new UserServiceCglibMethodInterceptor());  </span><br><span class="line">		return (UserServiceImpl)enhancer.create();</span><br><span class="line">	&#125;	</span><br><span class="line">&#125;</span><br><span class="line">//测试</span><br><span class="line">public class TestCglibProxy &#123;</span><br><span class="line"></span><br><span class="line">	public static void main(String[] args) &#123;</span><br><span class="line">		UserService userService = ProxyCglibFactory.getInstance();</span><br><span class="line">		User user = new User();</span><br><span class="line">		user.setId(12);</span><br><span class="line">		user.setName(&quot;哈哈&quot;);</span><br><span class="line">		user.setAge(23);</span><br><span class="line">		userService.add(user);</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>代理对象的生成过程由Enhancer类实现，大致步骤如下</p>
+<ol>
+<li>生成代理类Class的二进制字节码</li>
+<li>通过Class.foName加载二进制字节码，生成Class对象</li>
+<li>通过反射机制获取实例构造，并初始化代理类对象</li>
+</ol>
+<p>特点</p>
+<ol>
+<li>cglib的动态代理是针对类来实现代理</li>
+<li>对指定目标类产生一个子类，通过方法拦截技术拦截所有父类方法的调用</li>
+<li>因为是通过集成实现，final类无法使用cglib</li>
+</ol>
+<p>总结JDKProxy和CgLibProxy的区别</p>
+<ol>
+<li>jdk动态代理生成的代理类和委托类实现了相同的接口</li>
+<li>cglib动态代理中生成的字节码更加复杂，生成的代理类是委托类的子类，且不能处理被final修饰的类</li>
+<li>jdk采用反射机制调用委托类的方法，cglib采用类似索引的方式直接调用委托类方法</li>
+<li>jdk利用jdk的API，动态的再内存中构建代理对象</li>
+<li>cglib在内存中构建一个子类对象</li>
+<li>JDK动态代理生成的类为com.sun.proxy.$Proxy0</li>
+<li>cglib生成的类为class.cglib.委托类接口$$EnhancerByCGLIB$$552188b6<br><strong><em>JDK动态代理与CGLib动态代理均是实现Spring AOP的基础。</em></strong></li>
+</ol>
+<p>参考<br><a href="https://juejin.im/entry/5989712f6fb9a03c4c26fb3a" target="_blank" rel="noopener">JAVA中的静态代理、动态代理以及CGLIB动态代理</a><br><a href="my.oschina.net/robinyao/blog/811193">JDK动态代理详解</a><br><a href="http://1csh1.github.io/2017/02/20/Java%E7%9A%84%E9%9D%99%E6%80%81%E4%BB%A3%E7%90%86%E5%92%8C%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86/" target="_blank" rel="noopener">Java的静态代理和动态代理</a><br><a href="https://juejin.im/entry/5989712f6fb9a03c4c26fb3a" target="_blank" rel="noopener">JAVA中的静态代理、动态代理以及CGLIB动态代理</a><br><a href="https://mp.weixin.qq.com/s?__biz=MzU2MTI4MjI0MQ==&amp;mid=2247484707&amp;idx=1&amp;sn=b0fc5846e4b5f9c9a7ef1480a48e80ae&amp;scene=19#wechat_redirect" target="_blank" rel="noopener">深入理解［代理模式］原理与技术</a><br><a href="https://segmentfault.com/a/1190000011291179#articleHeader3" target="_blank" rel="noopener">Java三种代理模式：静态代理、动态代理和cglib代理</a><br><a href="jianshu.com/p/269afd0a52e6">JDK动态代理-超详细源码分析</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/04/10/静态代理、JDK动态代理、CgLib动态代理/" data-id="cjub7dmc80002mebkn693g2r5" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-java内存模型JMM" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2019/04/08/java内存模型JMM/" class="article-date">
@@ -114,7 +218,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/04/08/java内存模型JMM/" data-id="cju8eezi10001qobkorgbrvwe" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/04/08/java内存模型JMM/" data-id="cjub7dmbv0001mebk49pq76ar" class="article-share-link">Share</a>
       
       
     </footer>
@@ -223,7 +327,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/04/07/test-blog/" data-id="cju8eezid0002qobki3a15v5p" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/04/07/test-blog/" data-id="cjub7dmc90003mebkrn9efb2a" class="article-share-link">Share</a>
       
       
     </footer>
@@ -268,7 +372,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/04/07/hello-world/" data-id="cju8eezhw0000qobk62mc9ww7" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/04/07/hello-world/" data-id="cjub7dmbq0000mebkx4xtnqiv" class="article-share-link">Share</a>
       
       
     </footer>
@@ -307,6 +411,10 @@
     <h3 class="widget-title">Recent Posts</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2019/04/10/静态代理、JDK动态代理、CgLib动态代理/">静态代理、JDK动态代理、CgLib动态代理</a>
+          </li>
         
           <li>
             <a href="/2019/04/08/java内存模型JMM/">java内存模型JMM</a>
