@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+
+  
+  <title>BeanFactory和FactoryBean、ApplicationContext的区别 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="BeanFactoryBeanFactory是IOC最基本的容器，负责生产和管理bean，它在为其他具体的IOC容器提供了最基本的规范，例如XmlBeanFactory、ApplicationContext等具体的挺起都实现了BeanFactory，再在其基础上附加了其他功能BeanFactory源码123456789101112131415package org.springframework.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="BeanFactory和FactoryBean、ApplicationContext的区别">
+<meta property="og:url" content="http://yoursite.com/2019/04/15/BeanFactory和FactoryBean、ApplicationContext的区别/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="BeanFactoryBeanFactory是IOC最基本的容器，负责生产和管理bean，它在为其他具体的IOC容器提供了最基本的规范，例如XmlBeanFactory、ApplicationContext等具体的挺起都实现了BeanFactory，再在其基础上附加了其他功能BeanFactory源码123456789101112131415package org.springframework.">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20190415152958448.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM2ODc5ODcw,size_16,color_FFFFFF,t_70">
+<meta property="og:updated_time" content="2019-04-15T07:32:17.551Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="BeanFactory和FactoryBean、ApplicationContext的区别">
+<meta name="twitter:description" content="BeanFactoryBeanFactory是IOC最基本的容器，负责生产和管理bean，它在为其他具体的IOC容器提供了最基本的规范，例如XmlBeanFactory、ApplicationContext等具体的挺起都实现了BeanFactory，再在其基础上附加了其他功能BeanFactory源码123456789101112131415package org.springframework.">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/20190415152958448.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM2ODc5ODcw,size_16,color_FFFFFF,t_70">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-BeanFactory和FactoryBean、ApplicationContext的区别" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/04/15/BeanFactory和FactoryBean、ApplicationContext的区别/" class="article-date">
+  <time datetime="2019-04-15T07:31:53.000Z" itemprop="datePublished">2019-04-15</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      BeanFactory和FactoryBean、ApplicationContext的区别
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h6 id="BeanFactory"><a href="#BeanFactory" class="headerlink" title="BeanFactory"></a>BeanFactory</h6><p>BeanFactory是IOC最基本的容器，负责生产和管理bean，它在为其他具体的IOC容器提供了最基本的规范，例如XmlBeanFactory、ApplicationContext等具体的挺起都实现了BeanFactory，再在其基础上附加了其他功能<br><img src="https://img-blog.csdnimg.cn/20190415152958448.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM2ODc5ODcw,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br>BeanFactory源码<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">package org.springframework.beans.factory;  </span><br><span class="line">import org.springframework.beans.BeansException;  </span><br><span class="line">public interface BeanFactory &#123;  </span><br><span class="line">    String FACTORY_BEAN_PREFIX = &quot;&amp;&quot;;  </span><br><span class="line">    Object getBean(String name) throws BeansException;  </span><br><span class="line">    &lt;T&gt; T getBean(String name, Class&lt;T&gt; requiredType) throws BeansException;  </span><br><span class="line">    &lt;T&gt; T getBean(Class&lt;T&gt; requiredType) throws BeansException;  </span><br><span class="line">    Object getBean(String name, Object... args) throws BeansException;  </span><br><span class="line">    boolean containsBean(String name);  </span><br><span class="line">    boolean isSingleton(String name) throws NoSuchBeanDefinitionException;  </span><br><span class="line">    boolean isPrototype(String name) throws NoSuchBeanDefinitionException;  </span><br><span class="line">    boolean isTypeMatch(String name, Class&lt;?&gt; targetType) throws NoSuchBeanDefinitionException;  </span><br><span class="line">    Class&lt;?&gt; getType(String name) throws NoSuchBeanDefinitionException;  </span><br><span class="line">    String[] getAliases(String name);  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<ol>
+<li>BeanFactory，以Factory结尾，表示它是一个工厂类（接口），负责生产和管理bean的一个工厂。</li>
+<li>在Spring中，BeanFactory是IOC容器的核心接口，它的职责包括：实例化、定位、配置应用程序中的对象及建立这些对象间的依赖。</li>
+<li>BeanFactory只是一个接口，并不是IOC容器的具体实现，但是Spring容器给出了很多种实现。</li>
+<li>BeanFacotry是spring中比较原始的Factory。如XMLBeanFactory就是一种典型的BeanFactory。</li>
+<li>原始的BeanFactory无法支持spring的许多插件，如AOP功能、Web应用等</li>
+<li>ApplicationContext接口,它由BeanFactory接口派生而来， <h6 id="BeanFactory和FactoryBean的区别"><a href="#BeanFactory和FactoryBean的区别" class="headerlink" title="BeanFactory和FactoryBean的区别"></a>BeanFactory和FactoryBean的区别</h6>BeanFactory是接口，提供了IIOC容器最基本的形式，给具体的IOC容器的实现提供了规范<br>FactoryBean也是一个接口，当在IOC容器中的Bean实现了FactoryBean后，通过getBean(String BeanName)获取到的Bean对象并不是FactoryBean的实现类对象，而是这个实现类中的getObject()方法返回的对象。要想获取FactoryBean的实现类，就要getBean(“&amp;”+BeanName)。通过重写getBean方法，我们可以实现简单工厂模式和装饰者模式<br>FactoryBean源码<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">package org.springframework.beans.factory;  </span><br><span class="line">public interface FactoryBean&lt;T&gt; &#123;  </span><br><span class="line">    T getObject() throws Exception;  </span><br><span class="line">    Class&lt;?&gt; getObjectType();  </span><br><span class="line">    boolean isSingleton();  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>简单实例<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line">xml</span><br><span class="line">&lt;bean id=&quot;student&quot; class=&quot;com.spring.bean.Student&quot;&gt;  </span><br><span class="line">  &lt;property name=&quot;name&quot; value=&quot;zhangsan&quot; /&gt;  </span><br><span class="line"> &lt;/bean&gt;  </span><br><span class="line"> </span><br><span class="line"> &lt;bean id=&quot;school&quot; class=&quot;com.spring.bean.School&quot;&gt;  </span><br><span class="line"> &lt;/bean&gt; </span><br><span class="line"> </span><br><span class="line"> &lt;bean id=&quot;factoryBeanPojo&quot; class=&quot;com.spring.bean.FactoryBeanPojo&quot;&gt;  </span><br><span class="line">    &lt;property name=&quot;type&quot; value=&quot;student&quot; /&gt;</span><br><span class="line"> &lt;/bean&gt; </span><br><span class="line"> </span><br><span class="line">public class FactoryBeanPojo implements FactoryBean&#123;</span><br><span class="line">	private String type;</span><br><span class="line"> </span><br><span class="line">	@Override</span><br><span class="line">	public Object getObject() throws Exception &#123;</span><br><span class="line">		if(&quot;student&quot;.equals(type))&#123;</span><br><span class="line">			return new Student();			</span><br><span class="line">		&#125;else&#123;</span><br><span class="line">			return new School();</span><br><span class="line">		&#125;</span><br><span class="line">		</span><br><span class="line">	&#125;</span><br><span class="line"> </span><br><span class="line">	@Override</span><br><span class="line">	public Class getObjectType() &#123;</span><br><span class="line">		return School.class;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	@Override</span><br><span class="line">	public boolean isSingleton() &#123;</span><br><span class="line">		return true;</span><br><span class="line">    // settergetter</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public class School &#123;</span><br><span class="line">	private String schoolName;</span><br><span class="line">	private String address;</span><br><span class="line">	private int studentNumber;</span><br><span class="line">    // setter getter</span><br><span class="line">    // toString</span><br><span class="line">&#125;</span><br><span class="line">实现类</span><br><span class="line">ClassPathXmlApplicationContext cpxa = new ClassPathXmlApplicationContext(url);</span><br><span class="line">Object school=  cpxa.getBean(&quot;factoryBeanPojo&quot;);</span><br><span class="line">FactoryBeanPojo factoryBeanPojo= (FactoryBeanPojo) cpxa.getBean(&quot;&amp;factoryBeanPojo&quot;);</span><br><span class="line">System.out.println(school.getClass().getName());</span><br><span class="line">System.out.println(factoryBeanPojo.getClass().getName());</span><br><span class="line">输出</span><br><span class="line">com.spring.bean.Student</span><br><span class="line">com.spring.bean.FactoryBeanPojo</span><br></pre></td></tr></table></figure></p>
+<p><strong>一般情况下，Spring通过反射机制利用bean标签中的class属性指定实现类实例化Bean，在某些情况下，实例化Bean过程比较复杂，如果按照传统的方式。则需要在<bean>中提供大量的配置信息。配置方式的灵活性是受限的，这时采用编码的方式可能会得到一个简单的方案。Spring为此提供了一个org.springframework.bean.factory.FactoryBean的工厂类接口，用户可以通过实现该接口定制实例化Bean的逻辑。FactoryBean接口对于Spring框架来说占用重要的地位，Spring自身就提供了70多个FactoryBean的实现。</bean></strong><br>它们隐藏了实例化一些复杂Bean的细节，给上层应用带来了便利。从Spring3.0开始，FactoryBean开始支持泛型，即接口声明改为FactoryBean<t>的形式。<br>以Bean结尾，表示它是一个Bean，不同于普通Bean的是：它是实现了FactoryBean<t>接口的Bean，根据该Bean的ID从BeanFactory中获取的实际上是FactoryBean的getObject()返回的对象，而不是FactoryBean本身，如果要获取FactoryBean对象，请在id前面加一个&amp;符号来获取。<br>参考：<br><a href="https://www.cnblogs.com/aspirant/p/9082858.html" target="_blank" rel="noopener">BeanFactory 简介以及它 和FactoryBean的区别(阿里面试)</a><br><a href="https://blog.csdn.net/wangbiao007/article/details/53183764" target="_blank" rel="noopener">BeanFactory和FactoryBean的区别</a></t></t></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/04/15/BeanFactory和FactoryBean、ApplicationContext的区别/" data-id="cjui1j5gr0000cv3p08qwf4cs" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2019/04/11/工厂模式/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">工厂模式</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/04/">April 2019</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2019/04/15/BeanFactory和FactoryBean、ApplicationContext的区别/">BeanFactory和FactoryBean、ApplicationContext的区别</a>
+          </li>
+        
+          <li>
+            <a href="/2019/04/11/工厂模式/">工厂模式</a>
+          </li>
+        
+          <li>
+            <a href="/2019/04/10/静态代理、JDK动态代理、CgLib动态代理/">静态代理、JDK动态代理、CgLib动态代理</a>
+          </li>
+        
+          <li>
+            <a href="/2019/04/08/java内存模型JMM/">java内存模型JMM</a>
+          </li>
+        
+          <li>
+            <a href="/2019/04/07/test-blog/">test_blog</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2019 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>
